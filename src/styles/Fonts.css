@@ -1,0 +1,38 @@
+@font-face {
+  font-family: 'Neutra';
+  src: url('./Neutraface/NeutrafaceText-Bold.eot');
+  src: url('./Neutraface/NeutrafaceText-Bold.eot?#iefix')
+      format('embedded-opentype'),
+    url('./Neutraface/NeutrafaceText-Bold.woff') format('woff'),
+    url('./Neutraface/NeutrafaceText-Bold.ttf') format('truetype'),
+    url('./Neutraface/NeutrafaceText-Bold.svg#NeutrafaceText-Bold')
+      format('svg');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neutra';
+  src: url('./Neutraface/NeutrafaceText-Book.eot');
+  src: url('./Neutraface/NeutrafaceText-Book.eot?#iefix')
+      format('embedded-opentype'),
+    url('./Neutraface/NeutrafaceText-Book.woff') format('woff'),
+    url('./Neutraface/NeutrafaceText-Book.ttf') format('truetype'),
+    url('./Neutraface/NeutrafaceText-Book.svg#NeutrafaceText-Book')
+      format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neutra';
+  src: url('./Neutraface/NeutrafaceText-Demi.eot');
+  src: url('./Neutraface/NeutrafaceText-Demi.eot?#iefix')
+      format('embedded-opentype'),
+    url('./Neutraface/NeutrafaceText-Demi.woff') format('woff'),
+    url('./Neutraface/NeutrafaceText-Demi.ttf') format('truetype'),
+    url('./Neutraface/NeutrafaceText-Demi.svg#NeutrafaceText-Demi')
+      format('svg');
+  font-weight: 500;
+  font-style: normal;
+}

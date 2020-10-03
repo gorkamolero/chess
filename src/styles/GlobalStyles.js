@@ -17,6 +17,7 @@ export default createGlobalStyle`
   }
     
   body {
+    font-family: 'Neutra';
     display: flex;
     background-size: cover;
     &:before {
