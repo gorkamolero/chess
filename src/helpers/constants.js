@@ -4,3 +4,9 @@ export const nextFile = (file) => Files[Files.indexOf(file) + 1];
 export const prevFile = (file) => Files[Files.indexOf(file) - 1];
 export const isAdjacentFile = (ourFile, otherFile) =>
   [nextFile(ourFile), prevFile(ourFile)].includes(otherFile);
+export const initialRank = {
+  pawn: {
+    white: 2,
+    black: 7,
+  },
+};

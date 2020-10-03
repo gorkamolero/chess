@@ -10,12 +10,15 @@ export const Stage = styled.main`
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 10vh 10vw;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  padding: 6vh 6vw;
 `;
 
 export const BoardContainer = styled.div`
+  flex: 1;
   width: 100%;
+  min-width: 480px;
   max-width: 800px;
   &:after {
     content: '';
@@ -107,6 +110,7 @@ export const Piece = styled.div`
   background-size: 100%;
   background-position: center center;
   background-repeat: no-repeat;
+  cursor: pointer;
   ${({ piece, selected }) => `
     background-image: url(${piece});
     background-color: ${selected ? 'rgba(255, 255, 255, .6)' : 'transparent'};

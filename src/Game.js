@@ -1,6 +1,6 @@
 import React from 'react';
 import Pawn from 'components/Pawn';
-import { Files, Ranks, isAdjacentFile } from 'helpers/constants';
+import { Files, Ranks, isAdjacentFile, initialRank } from 'helpers/constants';
 
 export const GameContext = React.createContext(null);
 export const useGame = () => React.useContext(GameContext);
@@ -9,29 +9,37 @@ const getSquare = ({ file, rank }) => file + rank;
 const getRank = (square) => Number(square.split('')[1]);
 const getFile = (square) => square.split('')[0];
 
-function usePrevious(value) {
-  const ref = React.useRef();
-  React.useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-}
+export const useSquareColour = ({ rank, file, width }) => {
+  /* eslint-disable eqeqeq */
+  const getColour =
+    (Ranks.indexOf(rank) % 2 == 0 && Files.indexOf(file) % 2 == 1) ||
+    (Ranks.indexOf(rank) % 2 == 1 && Files.indexOf(file) % 2 == 0)
+      ? 'white'
+      : 'black';
+  /* eslint-enable */
+
+  const getBackgroundPosition = () => {
+    const x = (width / 8) * Files.indexOf(file);
+    const y = (width / 8) * Ranks.indexOf(rank);
+
+    return { width, x, y };
+  };
+
+  return {
+    colour: getColour,
+    backgroundPosition: getBackgroundPosition(),
+  };
+};
 
 export const Game = ({ children }) => {
   const [game, setGame] = React.useState([
     {
       Piece: Pawn,
-      file: 'd',
-      rank: 2,
-      colour: 'white',
-      id: 0,
-    },
-    {
-      Piece: Pawn,
+      type: 'pawn',
       file: 'c',
       rank: 7,
       colour: 'black',
-      id: 1,
+      id: 0,
     },
   ]);
 
@@ -40,7 +48,6 @@ export const Game = ({ children }) => {
     setSelectedSquare(selectedSquare === sq ? null : sq);
 
   const [selectedPiece, setSelectedPiece] = React.useState(null);
-  const previousSelectedPiece = usePrevious(selectedPiece);
   const setSelectedPieceByID = (id) => {
     if (!!selectedSquare) setSelectedSquare(null);
     if (selectedPiece && selectedPiece.id === id) setSelectedPiece(null);
@@ -49,16 +56,33 @@ export const Game = ({ children }) => {
 
   const [legalMoves, setLegalMoves] = React.useState([]);
 
-  const getLegalMoves = ({ game, piece, colour }) => {
-    if (piece.Piece === Pawn) {
+  const getLegalMoves = ({ game, piece }) => {
+    if (piece.type === 'pawn') {
       const legalMoves = [];
+      const initRank = initialRank.pawn[piece.colour];
+      const rankExists = (rank) => Ranks.includes(rank);
+      const rankIsBlocked = (sq) =>
+        game.find((other) => {
+          return getSquare(other) === sq;
+        });
 
       const findForward = () => {
-        const nextRank = piece.rank + 1;
+        // 1 Square
+        const nextRank =
+          piece.colour === 'white' ? piece.rank + 1 : piece.rank - 1;
 
         // If next rank actually exists!
-        if (Ranks.includes(nextRank))
+        if (rankExists(nextRank) && !rankIsBlocked(piece.file + nextRank)) {
           legalMoves.push(`${piece.file}${nextRank}`);
+        }
+
+        // 2 Squares
+        const torpedo =
+          piece.colour === 'white' ? piece.rank + 2 : piece.rank - 2;
+
+        if (piece.rank === initRank && !rankIsBlocked(piece.file + torpedo)) {
+          legalMoves.push(`${piece.file}${torpedo}`);
+        }
       };
 
       const findCapturesCaptures = () => {
@@ -66,12 +90,15 @@ export const Game = ({ children }) => {
         game
           .filter((p) => p.id !== piece.id)
           .forEach((other) => {
-            console.log(other);
-            // console.log(isAdjacentFile(piece.file, other.file));
+            const isNextRank =
+              piece.colour === 'white'
+                ? piece.rank + 1 === other.rank
+                : piece.rank - 1 === other.rank;
+
             if (
               // If they're in capturable positions...
               isAdjacentFile(piece.file, other.file) &&
-              piece.rank + 1 === other.rank
+              isNextRank
             ) {
               legalMoves.push(other.file + other.rank);
             }
@@ -81,6 +108,8 @@ export const Game = ({ children }) => {
       findForward();
       findCapturesCaptures();
 
+      console.log(legalMoves);
+
       return legalMoves;
     }
   };
@@ -89,7 +118,7 @@ export const Game = ({ children }) => {
     if (!selectedPiece) return;
     const legalMoves = getLegalMoves({ game, piece: selectedPiece });
     setLegalMoves(legalMoves);
-  }, [selectedPiece]);
+  }, [selectedPiece, game]);
 
   // Moving a piece
   React.useEffect(() => {
@@ -127,7 +156,7 @@ export const Game = ({ children }) => {
     } else {
       setSelectedPiece(null);
     }
-  }, [selectedSquare, selectedPiece]);
+  }, [selectedSquare, selectedPiece, game, legalMoves]);
 
   return (
     <GameContext.Provider
@@ -145,26 +174,4 @@ export const Game = ({ children }) => {
       {children}
     </GameContext.Provider>
   );
-};
-
-export const useSquareColour = ({ rank, file, width }) => {
-  /* eslint-disable eqeqeq */
-  const getColour =
-    (Ranks.indexOf(rank) % 2 == 0 && Files.indexOf(file) % 2 == 1) ||
-    (Ranks.indexOf(rank) % 2 == 1 && Files.indexOf(file) % 2 == 0)
-      ? 'white'
-      : 'black';
-  /* eslint-enable */
-
-  const getBackgroundPosition = () => {
-    const x = (width / 8) * Files.indexOf(file);
-    const y = (width / 8) * Ranks.indexOf(rank);
-
-    return { width, x, y };
-  };
-
-  return {
-    colour: getColour,
-    backgroundPosition: getBackgroundPosition(),
-  };
 };

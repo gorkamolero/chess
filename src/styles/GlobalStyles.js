@@ -20,7 +20,7 @@ export default createGlobalStyle`
     font-family: 'Neutra';
     display: flex;
     background-size: cover;
-    &:before {
+    &:before, &:after  {
       content: '';
       position: absolute;
       top: 0;
@@ -29,10 +29,16 @@ export default createGlobalStyle`
       left: 0;
       width: 100%;
       height: 100%;
+    }
+    &:before {
       background: url(${TextureLight});
       background-size: cover;
       opacity: .1;
     }
+    &:after {
+      background: rgba(0, 0, 0, .05);
+      z-index: -1;
+    } 
   }
 
   /* Reset */

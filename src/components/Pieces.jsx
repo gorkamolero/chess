@@ -7,7 +7,7 @@ const Pieces = () => {
   return (
     <>
       {game.map(({ Piece, id, ...rest }) => (
-        <Piece key={id} id={id} {...rest} />
+        <Piece key={rest.file + rest.rank} id={id} {...rest} />
       ))}
     </>
   );

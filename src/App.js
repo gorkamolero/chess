@@ -5,6 +5,7 @@ import { Game } from 'Game';
 import { Stage } from 'styles/StyledComps';
 import ChessBoard from 'components/ChessBoard';
 import Pieces from 'components/Pieces';
+import Controls from 'components/Controls';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <ChessBoard>
           <Pieces />
         </ChessBoard>
+        <Controls />
       </Stage>
     </Game>
   );

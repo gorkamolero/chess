@@ -29,10 +29,10 @@ const StyledButton = styled.button`
   justify-content: center;
   background: #f2f2f2;
   color: #464646;
-  font-size: 140%;
+  font-size: 220%;
   font-weight: 600;
   position: relative;
-  padding: 2em;
+  padding: 1.8em;
   border-radius: 6px;
   border: none;
   transition: all 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -103,7 +103,7 @@ const StyledButton = styled.button`
 `;
 
 const Container = styled(FlexBox)`
-  padding: 2em;
+  padding: 4em;
 `;
 
 export const Button = (props) => {
