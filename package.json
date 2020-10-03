@@ -12,6 +12,7 @@
     "react-declarative-grid": "^0.2.5",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
+    "react-styled-flex": "^1.0.19",
     "styled-components": "^5.2.0",
     "styled-css-grid": "^1.2.1",
     "styled-normalize": "^8.0.7",

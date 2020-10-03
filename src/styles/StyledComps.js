@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-
+import { Cell } from 'styled-css-grid';
 import WoodLight from 'assets/WoodLight.jpg';
 import WoodDark from 'assets/WoodDark.jpg';
 import WoodFrame from 'assets/WoodFrame.jpg';
@@ -58,4 +58,21 @@ export const SquareItem = styled.div`
         opacity: .65;
       }`;
   }}
+`;
+
+export const PieceContainer = styled(Cell)`
+  padding: 10px;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+`;
+
+export const Piece = styled.div`
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  ${({ piece }) => `
+    background-image: url(${piece});
+  `}
+  z-index: 1;
 `;

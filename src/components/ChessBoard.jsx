@@ -1,9 +1,10 @@
 import React from 'react';
 import { Grid, Cell } from 'styled-css-grid';
-import { MasterNumber, Files, Ranks } from 'helpers/constants';
+import { Files, Ranks } from 'helpers/constants';
 import { BoardContainer, Board, SquareItem } from 'styles/StyledComps';
 import useDebouncedResizeObserver from 'helpers/useDebouncedResizeObserver';
 import Pawn from 'components/Pawn';
+import { BoardFiles, BoardRanks } from 'components/FilesAndRanks.jsx';
 
 const Square = ({ area, rank, file, position, width }) => {
   /* eslint-disable eqeqeq */
@@ -29,7 +30,7 @@ const Square = ({ area, rank, file, position, width }) => {
         colour={getColour}
         data-position={position}
       >
-        {position}
+        {/* {position} */}
       </SquareItem>
     </Cell>
   );
@@ -38,14 +39,14 @@ const Square = ({ area, rank, file, position, width }) => {
 const ChessBoard = () => {
   const { ref, width } = useDebouncedResizeObserver(500);
 
-  const reversedRanks = Ranks.slice().reverse();
+  const reversedRanks = React.useMemo(() => Ranks.slice().reverse(), []);
 
   const boardPositions = React.useMemo(() => {
     const board = reversedRanks.map((r) =>
       Files.map((f) => `${f}${r}`).join(' ')
     );
     return board;
-  });
+  }, [reversedRanks]);
 
   return (
     <BoardContainer>
@@ -70,6 +71,10 @@ const ChessBoard = () => {
               />
             ))
           )}
+
+          <BoardRanks />
+          <BoardFiles />
+
           <Pawn area={'h5'} colour='white' />
         </Grid>
       </Board>

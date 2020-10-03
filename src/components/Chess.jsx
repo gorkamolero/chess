@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import 'styles/Fonts.css';
 
 import ChessBoard from 'components/ChessBoard';
 
