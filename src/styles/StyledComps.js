@@ -1,8 +1,18 @@
 import styled from 'styled-components';
 import { Cell } from 'styled-css-grid';
+import { FlexBox } from 'react-styled-flex';
 import WoodLight from 'assets/WoodLight.jpg';
 import WoodDark from 'assets/WoodDark.jpg';
 import WoodFrame from 'assets/WoodFrame.jpg';
+
+export const Stage = styled.main`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10vh 10vw;
+`;
 
 export const BoardContainer = styled.div`
   width: 100%;
@@ -42,26 +52,50 @@ export const SquareItem = styled.div`
   align-items: center;
   justify-content: center;
   padding: 0.5em;
+  position: relative;
 
-  ${(props) => props.colour === 'black' && 'position: relative;'}
+  ${(props) =>
+    props.colour === 'black' &&
+    `&:before {
+      content: '';
+      background-image: url(${WoodDark});
+      background-size: ${props.backgroundPosition.width}px ${props.backgroundPosition.width}px;
+      background-position: -${props.backgroundPosition.x}px -${props.backgroundPosition.y}px;
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: .65;
+    }`};
 
-  ${(props) => {
-    if (props.colour === 'black')
-      return `&:after {
-        content: '';
-        background-image: url(${WoodDark});
-        background-size: ${props.bgPosition.width}px ${props.bgPosition.width}px;
-        background-position: -${props.bgPosition.x}px -${props.bgPosition.y}px;
-        position: absolute;
-        top: 0; right: 0; bottom: 0; left: 0;
-        width: 100%; height: 100%;
-        opacity: .65;
-      }`;
-  }}
+  ${(props) =>
+    props.selected &&
+    `&:after {
+      content: '';
+      background: rgba(255, 255, 255, .5);
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: .65;
+    }`};
+`;
+
+export const IndicatorParent = styled(Cell)`
+  opacity: 0.4;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+export const Indicator = styled(FlexBox)`
+  width: 100%;
+  height: 100%;
+  padding: 6px 12px;
+  font-size: 60%;
+  pointer-events: none;
+  user-select: none;
 `;
 
 export const PieceContainer = styled(Cell)`
-  padding: 10px;
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -70,9 +104,12 @@ export const PieceContainer = styled(Cell)`
 export const Piece = styled.div`
   width: 100%;
   height: 100%;
-  background-size: contain;
-  ${({ piece }) => `
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  ${({ piece, selected }) => `
     background-image: url(${piece});
+    background-color: ${selected ? 'rgba(255, 255, 255, .6)' : 'transparent'};
   `}
   z-index: 1;
 `;

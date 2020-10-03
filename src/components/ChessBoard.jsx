@@ -3,40 +3,46 @@ import { Grid, Cell } from 'styled-css-grid';
 import { Files, Ranks } from 'helpers/constants';
 import { BoardContainer, Board, SquareItem } from 'styles/StyledComps';
 import useDebouncedResizeObserver from 'helpers/useDebouncedResizeObserver';
-import Pawn from 'components/Pawn';
+import { useGame, useSquareColour } from 'Game';
 import { BoardFiles, BoardRanks } from 'components/FilesAndRanks.jsx';
 
-const Square = ({ area, rank, file, position, width }) => {
-  /* eslint-disable eqeqeq */
-  const getColour =
-    (Ranks.indexOf(rank) % 2 == 0 && Files.indexOf(file) % 2 == 1) ||
-    (Ranks.indexOf(rank) % 2 == 1 && Files.indexOf(file) % 2 == 0)
-      ? 'white'
-      : 'black';
-  /* eslint-enable */
+const Squares = ({ ranks, files, width }) => {
+  return ranks.map((rank) =>
+    files.map((file) => {
+      const square = `${file}${rank}`;
+      return (
+        <Square
+          square={square}
+          key={square}
+          rank={rank}
+          file={file}
+          width={width}
+        />
+      );
+    })
+  );
+};
 
-  const getBackgroundPosition = () => {
-    const x = (width / 8) * Files.indexOf(file);
-    const y = (width / 8) * Ranks.indexOf(rank);
-
-    return { width, x, y };
-  };
+const Square = ({ square, rank, file, width }) => {
+  const { selectedSquare, setSelectedSquare } = useGame();
+  const { backgroundPosition, colour } = useSquareColour({ rank, file, width });
 
   return (
-    <Cell height={1} width={1} area={area}>
+    <Cell height={1} width={1} area={square}>
       <SquareItem
-        bgPosition={getBackgroundPosition()}
-        style={{ backgroundPosition: getBackgroundPosition() }}
-        colour={getColour}
-        data-position={position}
+        onClick={() => setSelectedSquare(square)}
+        backgroundPosition={backgroundPosition}
+        colour={colour}
+        selected={selectedSquare === square}
+        data-square={square}
       >
-        {/* {position} */}
+        {selectedSquare === square && square}
       </SquareItem>
     </Cell>
   );
 };
 
-const ChessBoard = () => {
+const ChessBoard = ({ children }) => {
   const { ref, width } = useDebouncedResizeObserver(500);
 
   const reversedRanks = React.useMemo(() => Ranks.slice().reverse(), []);
@@ -59,23 +65,10 @@ const ChessBoard = () => {
           gap={'0'}
           areas={boardPositions}
         >
-          {reversedRanks.map((rank) =>
-            Files.map((file) => (
-              <Square
-                area={`${file}${rank}`}
-                key={`${file}${rank}`}
-                rank={rank}
-                file={file}
-                position={`${file}${rank}`}
-                width={width}
-              />
-            ))
-          )}
-
           <BoardRanks />
           <BoardFiles />
-
-          <Pawn area={'h5'} colour='white' />
+          <Squares files={Files} ranks={reversedRanks} width={width} />
+          {children}
         </Grid>
       </Board>
     </BoardContainer>
