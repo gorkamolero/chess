@@ -26,7 +26,6 @@ const Controls = () => {
     const existingFiles = whitePawns.map((pawn) => pawn.file);
     const remainingFiles = Files.filter((n) => !existingFiles.includes(n));
     const randomized = shuffleArray(remainingFiles);
-    console.log(randomized);
     return randomized[0];
   };
 

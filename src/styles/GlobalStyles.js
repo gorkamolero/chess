@@ -5,6 +5,13 @@ import TextureLight from 'assets/TextureLight.jpg';
 export default createGlobalStyle`
   ${normalize}
 
+  :root {
+    --error: rgba(116, 47, 55, 0.41);
+    --gold: rgba(218,165,32, 0.4);
+    --blackTrans: rgba(0, 0, 0, .5);
+    --whiteTrans:  rgba(255, 255, 255, .5);
+  }
+
   html {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -43,4 +50,8 @@ export default createGlobalStyle`
 
   /* Reset */
   h1, h2, h3, h4, h5, h6 { margin: 0; }
+
+  .piece img {
+    transform: rotate(90deg);
+  }
 `;

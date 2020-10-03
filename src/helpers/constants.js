@@ -10,3 +10,6 @@ export const initialRank = {
     black: 7,
   },
 };
+export const ItemTypes = {
+  PAWN: 'Pawn',
+};

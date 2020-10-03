@@ -108,12 +108,11 @@ export const Game = ({ children }) => {
       findForward();
       findCapturesCaptures();
 
-      console.log(legalMoves);
-
       return legalMoves;
     }
   };
 
+  // Setting legal moves on init
   React.useEffect(() => {
     if (!selectedPiece) return;
     const legalMoves = getLegalMoves({ game, piece: selectedPiece });
@@ -123,7 +122,6 @@ export const Game = ({ children }) => {
   // Moving a piece
   React.useEffect(() => {
     if (!selectedPiece || !selectedSquare) return;
-    console.log(game);
 
     if (legalMoves.includes(selectedSquare)) {
       let newGame = [...game];
@@ -133,7 +131,7 @@ export const Game = ({ children }) => {
         newGame = newGame.filter(
           (piece) => getSquare(piece) !== selectedSquare
         );
-        console.log('Captures, captures', newGame);
+        // console.log('Captures, captures', newGame);
       }
 
       // Moving
@@ -148,7 +146,7 @@ export const Game = ({ children }) => {
           return movedPiece;
         } else return piece;
       });
-      console.log('Moving', newGame);
+      // console.log('Moving', newGame);
 
       setGame(newGame);
       setSelectedPiece(null);
@@ -157,6 +155,8 @@ export const Game = ({ children }) => {
       setSelectedPiece(null);
     }
   }, [selectedSquare, selectedPiece, game, legalMoves]);
+
+  const [dragging, setDragging] = React.useState(false);
 
   return (
     <GameContext.Provider
@@ -169,6 +169,8 @@ export const Game = ({ children }) => {
         movePiece: setSelectedPiece,
         setPiece: setSelectedPieceByID,
         legalMoves,
+        dragging,
+        setDragging,
       }}
     >
       {children}

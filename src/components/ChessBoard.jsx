@@ -1,10 +1,19 @@
 import React from 'react';
+import { DndProvider } from 'react-dnd';
+import { useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Grid, Cell } from 'styled-css-grid';
 import { Files, Ranks } from 'helpers/constants';
-import { BoardContainer, Board, SquareItem } from 'styles/StyledComps';
+import {
+  BoardContainer,
+  Board,
+  SquareItem,
+  MoveOverlay,
+} from 'styles/StyledComps';
 import useDebouncedResizeObserver from 'helpers/useDebouncedResizeObserver';
 import { useGame, useSquareColour } from 'Game';
 import { BoardFiles, BoardRanks } from 'components/FilesAndRanks.jsx';
+import { ItemTypes } from 'helpers/constants';
 
 const Squares = ({ ranks, files, width }) => {
   return ranks.map((rank) =>
@@ -24,12 +33,32 @@ const Squares = ({ ranks, files, width }) => {
 };
 
 const Square = ({ square, rank, file, width }) => {
-  const { selectedSquare, setSelectedSquare } = useGame();
+  const {
+    selectedSquare,
+    setSelectedSquare,
+    legalMoves,
+    movePiece,
+    selectedPiece,
+  } = useGame();
   const { backgroundPosition, colour } = useSquareColour({ rank, file, width });
+
+  const [{ isOver }, drop] = useDrop({
+    //legalMoves.includes(square)
+    accept: ItemTypes.PAWN,
+    drop: () => {
+      setSelectedSquare(square);
+      movePiece({ ...selectedPiece, rank, file });
+    }, // Move pawn
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+      // canDrop: !!monitor.canDrop(),
+    }),
+  });
 
   return (
     <Cell height={1} width={1} area={square}>
       <SquareItem
+        ref={drop}
         onClick={() => setSelectedSquare(square)}
         backgroundPosition={backgroundPosition}
         colour={colour}
@@ -37,6 +66,7 @@ const Square = ({ square, rank, file, width }) => {
         data-square={square}
       >
         {selectedSquare === square && square}
+        {isOver && <MoveOverlay legalMove={legalMoves.includes(square)} />}
       </SquareItem>
     </Cell>
   );
@@ -57,19 +87,22 @@ const ChessBoard = ({ children }) => {
   return (
     <BoardContainer>
       <Board className='board' ref={ref}>
-        <Grid
-          width='100%'
-          height='100%'
-          rows={'repeat(8, 1fr)'}
-          columns={'repeat(8, 1fr)'}
-          gap={'0'}
-          areas={boardPositions}
-        >
-          <BoardRanks />
-          <BoardFiles />
-          <Squares files={Files} ranks={reversedRanks} width={width} />
-          {children}
-        </Grid>
+        <DndProvider backend={HTML5Backend}>
+          <Grid
+            width='100%'
+            height='100%'
+            rows={'repeat(8, 1fr)'}
+            columns={'repeat(8, 1fr)'}
+            gap={'0'}
+            areas={boardPositions}
+            className='chess-grid'
+          >
+            <BoardRanks />
+            <BoardFiles />
+            <Squares files={Files} ranks={reversedRanks} width={width} />
+            {children}
+          </Grid>
+        </DndProvider>
       </Board>
     </BoardContainer>
   );

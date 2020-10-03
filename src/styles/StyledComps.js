@@ -74,7 +74,7 @@ export const SquareItem = styled.div`
     props.selected &&
     `&:after {
       content: '';
-      background: rgba(255, 255, 255, .5);
+      background: var(--gold);
       position: absolute;
       top: 0; right: 0; bottom: 0; left: 0;
       width: 100%; height: 100%;
@@ -102,6 +102,20 @@ export const PieceContainer = styled(Cell)`
   display: flex;
   align-items: stretch;
   justify-content: stretch;
+  ${(selected) =>
+    selected &&
+    `&:after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gold);
+    }`}
+  ${({ isDragging, selected }) =>
+    isDragging && !selected && `pointer-events: none;`}
 `;
 
 export const Piece = styled.div`
@@ -111,9 +125,23 @@ export const Piece = styled.div`
   background-position: center center;
   background-repeat: no-repeat;
   cursor: pointer;
-  ${({ piece, selected }) => `
+  ${({ piece, selected, isDragging }) => `
     background-image: url(${piece});
-    background-color: ${selected ? 'rgba(255, 255, 255, .6)' : 'transparent'};
+    background-color: ${selected ? 'var(--gold)' : 'transparent'};
+    opacity: ${isDragging ? '.5' : 1};
   `}
   z-index: 1;
+`;
+// Maybe: transform: scale(${isDragging ? 1.1 : 1});
+
+export const MoveOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: ${({ legalMove }) =>
+    legalMove ? 'var(--gold)' : 'var(--error)'};
 `;

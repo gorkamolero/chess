@@ -1,24 +1,45 @@
 import React from 'react';
-import styled from 'styled-components';
+import { ItemTypes } from 'helpers/constants';
+import { useDrag } from 'react-dnd';
 import { useGame } from 'Game';
+import { PieceContainer, Piece } from 'styles/StyledComps';
 import WhitePawn from 'assets/wp.png';
 import BlackPawn from 'assets/bp.png';
 import { pieceColour } from 'helpers/utils';
-import { PieceContainer, Piece } from 'styles/StyledComps';
 
 const Pawn = ({ file, rank, colour, id }) => {
-  const { selectedPiece, setPiece, setSelectedSquare } = useGame();
+  const {
+    selectedPiece,
+    setPiece,
+    setSelectedSquare,
+    dragging,
+    setDragging,
+  } = useGame();
   const [square, movePiece] = React.useState(file + rank);
+
+  const [{ isDragging }, drag] = useDrag({
+    item: { type: ItemTypes.PAWN },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+    begin: () => {
+      setDragging(true);
+      setPiece(id);
+    },
+    isDragging: () => {},
+    end: () => {
+      setDragging(false);
+      setPiece(null);
+    },
+  });
 
   React.useEffect(() => {
     movePiece(file + rank);
   }, [file, rank]);
 
   const onClickHandler = () => {
-    // If we already have selected a piece, we de-select
     if (selectedPiece) {
       setSelectedSquare(file + rank);
-      // setPiece(null);
     } else {
       setPiece(id);
     }
@@ -29,12 +50,16 @@ const Pawn = ({ file, rank, colour, id }) => {
       width={1}
       height={1}
       area={square}
-      className={`${colour} pawn`}
+      className={`piece ${colour} pawn`}
       onClick={onClickHandler}
+      isDragging={dragging}
+      selected={selectedPiece && selectedPiece.id === id}
     >
       <Piece
+        ref={drag}
         piece={pieceColour(colour, WhitePawn, BlackPawn)}
-        selected={selectedPiece && selectedPiece.id === id}
+        isDragging={isDragging}
+        style={{ opacity: isDragging ? '.5' : 1 }}
       />
     </PieceContainer>
   );
