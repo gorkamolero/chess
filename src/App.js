@@ -15,6 +15,7 @@ function App() {
           <Pieces />
         </ChessBoard>
       </Stage>
+    </Game>
   );
 }
 
