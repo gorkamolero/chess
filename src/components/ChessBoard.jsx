@@ -86,7 +86,7 @@ const ChessBoard = ({ children }) => {
   }, [reversedRanks]);
 
   return (
-    <BoardContainer style={{ maxHeight: width }}>
+    <BoardContainer>
       <Board className='board' ref={ref}>
         <DndProvider backend={HTML5Backend}>
           <Grid

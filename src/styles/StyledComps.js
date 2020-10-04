@@ -19,13 +19,14 @@ export const Stage = styled.main`
   @media (max-width: ${breakpoint}) {
     flex-direction: column;
     padding: 3vh 3vw;
+    justify-content: flex-start;
   }
 `;
 
 export const BoardContainer = styled.div`
-  flex: 1;
+  /* flex: 1; */
   width: 100%;
-  min-width: 480px;
+  min-width: 320px;
   max-width: 800px;
   &:after {
     content: '';
