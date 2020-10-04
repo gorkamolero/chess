@@ -4,6 +4,8 @@ import { useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Grid, Cell } from 'styled-css-grid';
 import { Files, Ranks } from 'helpers/constants';
+import { useGame } from 'Game';
+import { useSquareColour } from 'helpers/utils';
 import {
   BoardContainer,
   Board,
@@ -11,7 +13,6 @@ import {
   MoveOverlay,
 } from 'styles/StyledComps';
 import useDebouncedResizeObserver from 'helpers/useDebouncedResizeObserver';
-import { useGame, useSquareColour } from 'Game';
 import { BoardFiles, BoardRanks } from 'components/FilesAndRanks.jsx';
 import { ItemTypes } from 'helpers/constants';
 
@@ -43,7 +44,6 @@ const Square = ({ square, rank, file, width }) => {
   const { backgroundPosition, colour } = useSquareColour({ rank, file, width });
 
   const [{ isOver }, drop] = useDrop({
-    //legalMoves.includes(square)
     accept: ItemTypes.PAWN,
     drop: () => {
       setSelectedSquare(square);
@@ -51,7 +51,6 @@ const Square = ({ square, rank, file, width }) => {
     }, // Move pawn
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
-      // canDrop: !!monitor.canDrop(),
     }),
   });
 
@@ -59,7 +58,9 @@ const Square = ({ square, rank, file, width }) => {
     <Cell height={1} width={1} area={square}>
       <SquareItem
         ref={drop}
-        onClick={() => setSelectedSquare(square)}
+        onClick={() => {
+          setSelectedSquare(square);
+        }}
         backgroundPosition={backgroundPosition}
         colour={colour}
         selected={selectedSquare === square}
@@ -85,7 +86,7 @@ const ChessBoard = ({ children }) => {
   }, [reversedRanks]);
 
   return (
-    <BoardContainer>
+    <BoardContainer style={{ maxHeight: width }}>
       <Board className='board' ref={ref}>
         <DndProvider backend={HTML5Backend}>
           <Grid

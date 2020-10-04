@@ -1,37 +1,20 @@
 import React from 'react';
 import Pawn from 'components/Pawn';
-import { Files, Ranks, isAdjacentFile, initialRank } from 'helpers/constants';
+import { findAdjacentFiles, pieceRules } from 'helpers/constants';
+import { getSquare, getRank, getFile } from 'helpers/utils';
 
+// We're going to use some React magic here
 export const GameContext = React.createContext(null);
 export const useGame = () => React.useContext(GameContext);
 
-const getSquare = ({ file, rank }) => file + rank;
-const getRank = (square) => Number(square.split('')[1]);
-const getFile = (square) => square.split('')[0];
+/*
 
-export const useSquareColour = ({ rank, file, width }) => {
-  /* eslint-disable eqeqeq */
-  const getColour =
-    (Ranks.indexOf(rank) % 2 == 0 && Files.indexOf(file) % 2 == 1) ||
-    (Ranks.indexOf(rank) % 2 == 1 && Files.indexOf(file) % 2 == 0)
-      ? 'white'
-      : 'black';
-  /* eslint-enable */
+Game is our most important component. It encapsulates the rules
 
-  const getBackgroundPosition = () => {
-    const x = (width / 8) * Files.indexOf(file);
-    const y = (width / 8) * Ranks.indexOf(rank);
-
-    return { width, x, y };
-  };
-
-  return {
-    colour: getColour,
-    backgroundPosition: getBackgroundPosition(),
-  };
-};
+*/
 
 export const Game = ({ children }) => {
+  // Here we declare the initial positions on the board
   const [game, setGame] = React.useState([
     {
       Piece: Pawn,
@@ -43,10 +26,6 @@ export const Game = ({ children }) => {
     },
   ]);
 
-  const [selectedSquare, setSelectedSquare] = React.useState(null);
-  const toggleSelectedSquare = (sq) =>
-    setSelectedSquare(selectedSquare === sq ? null : sq);
-
   const [selectedPiece, setSelectedPiece] = React.useState(null);
   const setSelectedPieceByID = (id) => {
     if (!!selectedSquare) setSelectedSquare(null);
@@ -54,107 +33,31 @@ export const Game = ({ children }) => {
     else setSelectedPiece(game.find((piece) => piece.id === id));
   };
 
-  const [legalMoves, setLegalMoves] = React.useState([]);
+  const [selectedSquare, setSelectedSquare] = React.useState(null);
+  const toggleSelectedSquare = (sq) =>
+    setSelectedSquare(selectedSquare === sq ? null : sq);
 
-  const getLegalMoves = ({ game, piece }) => {
-    if (piece.type === 'pawn') {
-      const legalMoves = [];
-      const initRank = initialRank.pawn[piece.colour];
-      const rankExists = (rank) => Ranks.includes(rank);
-      const rankIsBlocked = (sq) =>
-        game.find((other) => {
-          return getSquare(other) === sq;
-        });
+  const legalMoves = useLegalMoves({ game, selectedPiece });
 
-      const findForward = () => {
-        // 1 Square
-        const nextRank =
-          piece.colour === 'white' ? piece.rank + 1 : piece.rank - 1;
-
-        // If next rank actually exists!
-        if (rankExists(nextRank) && !rankIsBlocked(piece.file + nextRank)) {
-          legalMoves.push(`${piece.file}${nextRank}`);
-        }
-
-        // 2 Squares
-        const torpedo =
-          piece.colour === 'white' ? piece.rank + 2 : piece.rank - 2;
-
-        if (piece.rank === initRank && !rankIsBlocked(piece.file + torpedo)) {
-          legalMoves.push(`${piece.file}${torpedo}`);
-        }
-      };
-
-      const findCapturesCaptures = () => {
-        // Find other pieces
-        game
-          .filter((p) => p.id !== piece.id)
-          .forEach((other) => {
-            const isNextRank =
-              piece.colour === 'white'
-                ? piece.rank + 1 === other.rank
-                : piece.rank - 1 === other.rank;
-
-            if (
-              // If they're in capturable positions...
-              isAdjacentFile(piece.file, other.file) &&
-              isNextRank
-            ) {
-              legalMoves.push(other.file + other.rank);
-            }
-          });
-      };
-
-      findForward();
-      findCapturesCaptures();
-
-      return legalMoves;
-    }
-  };
-
-  // Setting legal moves on init
-  React.useEffect(() => {
-    if (!selectedPiece) return;
-    const legalMoves = getLegalMoves({ game, piece: selectedPiece });
-    setLegalMoves(legalMoves);
-  }, [selectedPiece, game]);
+  const movePiece = usePieceMoves({
+    game,
+    setGame,
+    selectedPiece,
+    selectedSquare,
+  });
 
   // Moving a piece
   React.useEffect(() => {
     if (!selectedPiece || !selectedSquare) return;
 
     if (legalMoves.includes(selectedSquare)) {
-      let newGame = [...game];
-
-      // Capturing
-      if (game.find((piece) => getSquare(piece) === selectedSquare)) {
-        newGame = newGame.filter(
-          (piece) => getSquare(piece) !== selectedSquare
-        );
-        // console.log('Captures, captures', newGame);
-      }
-
-      // Moving
-      newGame = newGame.map((piece) => {
-        if (piece.id === selectedPiece.id) {
-          const movedPiece = {
-            ...selectedPiece,
-            square: selectedSquare,
-            rank: getRank(selectedSquare),
-            file: getFile(selectedSquare),
-          };
-          return movedPiece;
-        } else return piece;
-      });
-      // console.log('Moving', newGame);
-
-      setGame(newGame);
+      movePiece({ game, selectedPiece, selectedSquare });
       setSelectedPiece(null);
       setSelectedSquare(null);
     } else {
       setSelectedPiece(null);
     }
-  }, [selectedSquare, selectedPiece, game, legalMoves]);
+  }, [selectedSquare, selectedPiece, game, legalMoves, movePiece]);
 
   const [dragging, setDragging] = React.useState(false);
 
@@ -176,4 +79,114 @@ export const Game = ({ children }) => {
       {children}
     </GameContext.Provider>
   );
+};
+
+const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
+  // Moving pieces
+  const movePiece = ({ game, selectedPiece, selectedSquare }) => {
+    const movedPiece = {
+      ...selectedPiece,
+      square: selectedSquare,
+      rank: getRank(selectedSquare),
+      file: getFile(selectedSquare),
+    };
+
+    // Construct the new position
+    const newGame = [...game].map((piece) =>
+      piece.id === selectedPiece.id ? movedPiece : piece
+    );
+    setGame(newGame);
+  };
+
+  const moveOrCapture = ({ game, selectedPiece, selectedSquare }) => {
+    // Captures, captures!
+    if (game.find((piece) => getSquare(piece) === selectedSquare)) {
+      const newGame = [...game].filter(
+        (piece) => getSquare(piece) !== selectedSquare
+      );
+      movePiece({ game: newGame, selectedPiece, selectedSquare });
+    } else {
+      movePiece({ game, selectedPiece, selectedSquare });
+    }
+  };
+
+  return moveOrCapture;
+};
+const useLegalMoves = ({ game, selectedPiece }) => {
+  const [legalMoves, setLegalMoves] = React.useState([]);
+
+  const getLegalMoves = ({ game, piece }) => {
+    const initRank = pieceRules[piece.type].initialRank[piece.colour];
+    const rules = pieceRules[piece.type];
+
+    const isSquareOccupied = (sq) => {
+      return game.find((somePiece) => somePiece.file + somePiece.rank === sq);
+    };
+
+    const canCapture = (piece, sq) => {
+      return game.find(
+        (somePiece) =>
+          somePiece.file + somePiece.rank === sq &&
+          piece.colour !== somePiece.colour
+      );
+    };
+
+    // Calculate moving or ccapturing: abstracted so it could be used in any piece.
+    const possibleMoves = (rules, piece) => {
+      let targetRanks = [];
+      if (rules.direction === 'forward' || rules.direction === 'diagonal') {
+        for (let i = 1; i <= rules.squares; i++) {
+          if (piece.colour === 'white') targetRanks.push(piece.rank + i);
+          else targetRanks.push(piece.rank - i);
+        }
+
+        if (rules.direction === 'forward') {
+          return targetRanks.map((rank) => piece.file + rank);
+        }
+
+        if (rules.direction === 'diagonal') {
+          const captures = [];
+          targetRanks.forEach((rank, i) =>
+            findAdjacentFiles(piece.file).forEach((file) =>
+              captures.push(file + rank)
+            )
+          );
+          return captures;
+        }
+      } else {
+        console.log('No moves');
+      }
+    };
+
+    const findActualMoves = (piece) => {
+      const moves = possibleMoves(rules.move, piece).filter(
+        (move) => !isSquareOccupied(move)
+      );
+
+      const captures = possibleMoves(rules.captures, piece).filter(
+        (move) => isSquareOccupied(move) && canCapture(piece, move)
+      );
+
+      const actualMoves = [...moves, ...captures];
+
+      return actualMoves;
+    };
+
+    // Pawn case
+    if (piece.type === 'pawn') {
+      // Special rule: Torpedo time!
+      rules.move.squares = piece.rank === initRank ? 2 : 1;
+    }
+
+    return findActualMoves(piece);
+  };
+
+  // Setting legal moves on init
+  React.useEffect(() => {
+    if (!selectedPiece) return;
+    const legalMoves = getLegalMoves({ game, piece: selectedPiece });
+    setLegalMoves(legalMoves);
+  }, [selectedPiece, game]);
+
+  return legalMoves;
 };

@@ -4,10 +4,21 @@ export const nextFile = (file) => Files[Files.indexOf(file) + 1];
 export const prevFile = (file) => Files[Files.indexOf(file) - 1];
 export const isAdjacentFile = (ourFile, otherFile) =>
   [nextFile(ourFile), prevFile(ourFile)].includes(otherFile);
-export const initialRank = {
+export const findAdjacentFiles = (file) => [prevFile(file), nextFile(file)];
+export const pieceRules = {
   pawn: {
-    white: 2,
-    black: 7,
+    initialRank: {
+      white: 2,
+      black: 7,
+    },
+    move: {
+      direction: 'forward',
+      squares: 1,
+    },
+    captures: {
+      direction: 'diagonal',
+      squares: 1,
+    },
   },
 };
 export const ItemTypes = {

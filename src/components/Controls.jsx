@@ -14,35 +14,38 @@ const Controls = () => {
 
   const genRandomID = (min, max) => {
     const existingIDs = game.map((piece) => piece.id);
-    function generateRandomID(min, max) {
+    function generateRandomExcluding(min, max) {
       const num = Math.floor(Math.random() * (max - min + 1)) + min;
-      return existingIDs.includes[num] ? generateRandomID(min, max) : num;
+      return existingIDs.includes[num]
+        ? generateRandomExcluding(min, max)
+        : num;
     }
 
-    return generateRandomID(min, max);
+    return generateRandomExcluding(min, max);
   };
 
-  const genRandomFile = () => {
+  const chooseRandomFile = () => {
     const existingFiles = whitePawns.map((pawn) => pawn.file);
     const remainingFiles = Files.filter((n) => !existingFiles.includes(n));
-    const randomized = shuffleArray(remainingFiles);
-    return randomized[0];
+    const randomizeArray = shuffleArray(remainingFiles);
+    return randomizeArray[0];
   };
 
   const addPawn = () => {
-    if (whitePawns.length < Files.length) {
-      console.log('Adding ♟️');
-      const newPawn = {
-        Piece: Pawn,
-        type: 'pawn',
-        file: genRandomFile(),
-        rank: 2,
-        colour: 'white',
-        id: genRandomID(1, 10000),
-      };
+    const reachedMaxPawns = whitePawns.length >= Files.length;
+    if (reachedMaxPawns) return;
 
-      setGame([...game, newPawn]);
-    }
+    console.log('Adding ♟️');
+    const newPawn = {
+      Piece: Pawn,
+      type: 'pawn',
+      file: chooseRandomFile(),
+      rank: 2,
+      colour: 'white',
+      id: genRandomID(1, 10000),
+    };
+
+    setGame([...game, newPawn]);
   };
 
   return <Button onClick={addPawn} text='♟️'></Button>;

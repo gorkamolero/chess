@@ -5,6 +5,8 @@ import WoodLight from 'assets/WoodLight.jpg';
 import WoodDark from 'assets/WoodDark.jpg';
 import WoodFrame from 'assets/WoodFrame.jpg';
 
+export const breakpoint = '768px';
+
 export const Stage = styled.main`
   width: 100vw;
   height: 100vh;
@@ -13,6 +15,11 @@ export const Stage = styled.main`
   justify-content: space-between;
   flex-wrap: nowrap;
   padding: 6vh 6vw;
+
+  @media (max-width: ${breakpoint}) {
+    flex-direction: column;
+    padding: 3vh 3vw;
+  }
 `;
 
 export const BoardContainer = styled.div`

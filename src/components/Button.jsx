@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { FlexBox } from 'react-styled-flex';
+import { breakpoint } from 'styles/StyledComps';
 
 // TODO: Make text move slightly on active state
 
@@ -38,6 +39,10 @@ const StyledButton = styled.button`
   transition: all 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: -2px -6px 15px #fff, 2px 6px 15px rgba(0, 0, 0, 0.15);
   user-select: none;
+
+  @media (max-width: ${breakpoint}) {
+    padding: 40px;
+  }
 
   ${(p) =>
     p.theme === 'dark' &&
@@ -104,6 +109,9 @@ const StyledButton = styled.button`
 
 const Container = styled(FlexBox)`
   padding: 4em;
+  @media (max-width: ${breakpoint}) {
+    padding: 2em;
+  }
 `;
 
 export const Button = (props) => {
