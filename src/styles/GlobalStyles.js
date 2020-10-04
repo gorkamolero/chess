@@ -48,4 +48,19 @@ export default createGlobalStyle`
 
   /* Reset */
   h1, h2, h3, h4, h5, h6 { margin: 0; }
+
+  .piece {
+    animation-name: fadeIn;
+    animation-duration: .2s;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
 `;

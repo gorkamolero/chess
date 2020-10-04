@@ -1,5 +1,4 @@
 import React from 'react';
-import Pawn from 'components/Piece';
 import { findAdjacentFiles, pieceRules } from 'helpers/constants';
 import { getSquare, getRank, getFile } from 'helpers/utils';
 
@@ -17,7 +16,6 @@ export const Game = ({ children }) => {
   // Here we declare the initial positions on the board
   const [game, setGame] = React.useState([
     {
-      Piece: Pawn,
       type: 'pawn',
       file: 'c',
       rank: 7,
@@ -28,7 +26,6 @@ export const Game = ({ children }) => {
 
   const [selectedPiece, setSelectedPiece] = React.useState(null);
   const setSelectedPieceByID = (id) => {
-    console.log('SETTING', id);
     if (!!selectedSquare) setSelectedSquare(null);
     if (selectedPiece && selectedPiece.id === id) setSelectedPiece(null);
     else setSelectedPiece(game.find((piece) => piece.id === id));
