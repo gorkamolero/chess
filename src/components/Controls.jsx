@@ -3,7 +3,7 @@ import { useGame } from 'Game';
 import { Button } from 'components/Button';
 import { Files } from 'helpers/constants';
 import { shuffleArray } from 'helpers/utils';
-import Pawn from 'components/Pawn';
+import Pawn from 'components/Piece';
 
 const Controls = () => {
   const { game, setGame } = useGame();

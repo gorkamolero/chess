@@ -1,5 +1,5 @@
 import React from 'react';
-import Pawn from 'components/Pawn';
+import Pawn from 'components/Piece';
 import { findAdjacentFiles, pieceRules } from 'helpers/constants';
 import { getSquare, getRank, getFile } from 'helpers/utils';
 
@@ -28,6 +28,7 @@ export const Game = ({ children }) => {
 
   const [selectedPiece, setSelectedPiece] = React.useState(null);
   const setSelectedPieceByID = (id) => {
+    console.log('SETTING', id);
     if (!!selectedSquare) setSelectedSquare(null);
     if (selectedPiece && selectedPiece.id === id) setSelectedPiece(null);
     else setSelectedPiece(game.find((piece) => piece.id === id));

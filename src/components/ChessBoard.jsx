@@ -67,7 +67,7 @@ const Square = ({ square, rank, file, width }) => {
         data-square={square}
       >
         {selectedSquare === square && square}
-        {isOver && <MoveOverlay legalMove={legalMoves.includes(square)} />}
+        {isOver && <MoveOverlay legal={legalMoves.includes(square)} />}
       </SquareItem>
     </Cell>
   );

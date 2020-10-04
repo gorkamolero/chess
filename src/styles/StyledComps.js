@@ -110,6 +110,7 @@ export const PieceContainer = styled(Cell)`
   display: flex;
   align-items: stretch;
   justify-content: stretch;
+  position: relative;
   ${(selected) =>
     selected &&
     `&:after {
@@ -123,10 +124,10 @@ export const PieceContainer = styled(Cell)`
       background: var(--gold);
     }`}
   ${({ isDragging, selected }) =>
-    isDragging && !selected && `pointer-events: none;`}
+    isDragging && !selected && `pointer-events: none;`};
 `;
 
-export const Piece = styled.div`
+export const PieceUI = styled.div`
   width: 100%;
   height: 100%;
   background-size: 100%;
@@ -137,7 +138,7 @@ export const Piece = styled.div`
     background-image: url(${piece});
     background-color: ${selected ? 'var(--gold)' : 'transparent'};
     opacity: ${isDragging ? '.5' : 1};
-  `}
+  `};
   z-index: 1;
 `;
 // Maybe: transform: scale(${isDragging ? 1.1 : 1});
@@ -150,6 +151,6 @@ export const MoveOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${({ legalMove }) =>
-    legalMove ? 'var(--gold)' : 'var(--error)'};
+  background: rgba(255, 255, 255, 0.5);
+  background: ${({ legal }) => (legal ? 'var(--gold)' : 'var(--error)')};
 `;

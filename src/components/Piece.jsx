@@ -2,12 +2,12 @@ import React from 'react';
 import { pieces } from 'helpers/constants';
 import { useDrag } from 'react-dnd';
 import { useGame } from 'Game';
-import { PieceContainer, Piece } from 'styles/StyledComps';
+import { PieceContainer, PieceUI, MoveOverlay } from 'styles/StyledComps';
 import WhitePawn from 'assets/wp.png';
 import BlackPawn from 'assets/bp.png';
 import { pieceColour } from 'helpers/utils';
 
-const Pawn = ({ file, rank, colour, id }) => {
+const Piece = ({ file, rank, colour, id, type }) => {
   const {
     selectedPiece,
     setPiece,
@@ -37,7 +37,8 @@ const Pawn = ({ file, rank, colour, id }) => {
     movePiece(file + rank);
   }, [file, rank]);
 
-  const onClickHandler = () => {
+  const select = () => {
+    console.log('Clicking', selectedPiece);
     if (selectedPiece) {
       setSelectedSquare(file + rank);
     } else {
@@ -45,24 +46,34 @@ const Pawn = ({ file, rank, colour, id }) => {
     }
   };
 
+  const handleType = React.useMemo(() => {
+    if (type === 'pawn') {
+      return pieceColour(colour, WhitePawn, BlackPawn);
+    }
+  }, [type, colour]);
+
+  const isSelected = selectedPiece && selectedPiece.id === id;
+
   return (
     <PieceContainer
       width={1}
       height={1}
       area={square}
       className={`piece ${colour} pawn`}
-      onClick={onClickHandler}
+      onClick={select}
       isDragging={dragging}
-      selected={selectedPiece && selectedPiece.id === id}
+      selected={isSelected}
     >
-      <Piece
+      <PieceUI
         ref={drag}
-        piece={pieceColour(colour, WhitePawn, BlackPawn)}
+        piece={handleType}
         isDragging={isDragging}
         style={{ opacity: isDragging ? '.5' : 1 }}
       />
+
+      {isSelected && <MoveOverlay legal />}
     </PieceContainer>
   );
 };
 
-export default Pawn;
+export default Piece;
