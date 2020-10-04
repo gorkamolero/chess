@@ -21,6 +21,6 @@ export const pieceRules = {
     },
   },
 };
-export const ItemTypes = {
+export const pieces = {
   PAWN: 'Pawn',
 };

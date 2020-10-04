@@ -1,5 +1,5 @@
 import React from 'react';
-import { ItemTypes } from 'helpers/constants';
+import { pieces } from 'helpers/constants';
 import { useDrag } from 'react-dnd';
 import { useGame } from 'Game';
 import { PieceContainer, Piece } from 'styles/StyledComps';
@@ -18,7 +18,7 @@ const Pawn = ({ file, rank, colour, id }) => {
   const [square, movePiece] = React.useState(file + rank);
 
   const [{ isDragging }, drag] = useDrag({
-    item: { type: ItemTypes.PAWN },
+    item: { type: pieces.PAWN },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),

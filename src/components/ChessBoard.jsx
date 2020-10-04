@@ -14,7 +14,7 @@ import {
 } from 'styles/StyledComps';
 import useDebouncedResizeObserver from 'helpers/useDebouncedResizeObserver';
 import { BoardFiles, BoardRanks } from 'components/FilesAndRanks.jsx';
-import { ItemTypes } from 'helpers/constants';
+import { pieces } from 'helpers/constants';
 
 const Squares = ({ ranks, files, width }) => {
   return ranks.map((rank) =>
@@ -44,7 +44,7 @@ const Square = ({ square, rank, file, width }) => {
   const { backgroundPosition, colour } = useSquareColour({ rank, file, width });
 
   const [{ isOver }, drop] = useDrop({
-    accept: ItemTypes.PAWN,
+    accept: pieces.PAWN,
     drop: () => {
       setSelectedSquare(square);
       movePiece({ ...selectedPiece, rank, file });
