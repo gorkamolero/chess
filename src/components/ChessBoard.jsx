@@ -41,8 +41,11 @@ const Square = ({ square, rank, file, width }) => {
     movePiece,
     selectedPiece,
   } = useGame();
+
+  // Setting BG Colour for squares
   const { backgroundPosition, colour } = useSquareColour({ rank, file, width });
 
+  // Dragging & Dropping
   const [{ isOver }, drop] = useDrop({
     accept: pieces.PAWN,
     drop: () => {
@@ -76,8 +79,10 @@ const Square = ({ square, rank, file, width }) => {
 const ChessBoard = ({ children }) => {
   const { ref, width } = useDebouncedResizeObserver(500);
 
+  // We need ranks in the direction of the browse
   const reversedRanks = React.useMemo(() => Ranks.slice().reverse(), []);
 
+  // The 64 squares, in strings, for the Grid
   const boardPositions = React.useMemo(() => {
     const board = reversedRanks.map((r) =>
       Files.map((f) => `${f}${r}`).join(' ')
@@ -98,9 +103,14 @@ const ChessBoard = ({ children }) => {
             areas={boardPositions}
             className='chess-grid'
           >
+            {/* Indicators */}
             <BoardRanks />
             <BoardFiles />
+
+            {/* Squares */}
             <Squares files={Files} ranks={reversedRanks} width={width} />
+
+            {/* Pieces */}
             {children}
           </Grid>
         </DndProvider>

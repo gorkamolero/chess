@@ -29,6 +29,12 @@ export const Piece = ({ file, rank, colour, id, type }) => {
   } = useGame();
   const [square, movePiece] = React.useState(file + rank);
 
+  // Moving the piece if its rank or file changes
+  React.useEffect(() => {
+    movePiece(file + rank);
+  }, [file, rank]);
+
+  // Dragging & dropping
   const [{ isDragging }, drag] = useDrag({
     item: { type: pieces.PAWN },
     collect: (monitor) => ({
@@ -45,10 +51,7 @@ export const Piece = ({ file, rank, colour, id, type }) => {
     },
   });
 
-  React.useEffect(() => {
-    movePiece(file + rank);
-  }, [file, rank]);
-
+  // Clicking
   const select = () => {
     if (selectedPiece) {
       setSelectedSquare(file + rank);
@@ -57,12 +60,14 @@ export const Piece = ({ file, rank, colour, id, type }) => {
     }
   };
 
+  // Handling UI
   const handleType = React.useMemo(() => {
     if (type === 'pawn') {
       return pieceColour(colour, WhitePawn, BlackPawn);
     }
   }, [type, colour]);
 
+  // Helper
   const isSelected = selectedPiece && selectedPiece.id === id;
 
   return (

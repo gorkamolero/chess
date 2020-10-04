@@ -24,6 +24,7 @@ export const Game = ({ children }) => {
     },
   ]);
 
+  // Selecting pieces
   const [selectedPiece, setSelectedPiece] = React.useState(null);
   const setSelectedPieceByID = (id) => {
     if (!!selectedSquare) setSelectedSquare(null);
@@ -31,6 +32,7 @@ export const Game = ({ children }) => {
     else setSelectedPiece(game.find((piece) => piece.id === id));
   };
 
+  // Selecting squares
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const toggleSelectedSquare = (sq) =>
     setSelectedSquare(selectedSquare === sq ? null : sq);
@@ -82,6 +84,7 @@ export const Game = ({ children }) => {
 const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
   // Moving pieces
   const movePiece = ({ game, selectedPiece, selectedSquare }) => {
+    // Moving requires a selected piece and a selected square
     const movedPiece = {
       ...selectedPiece,
       square: selectedSquare,
@@ -96,12 +99,16 @@ const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
     setGame(newGame);
   };
 
+  // Captures, captures!
   const moveOrCapture = ({ game, selectedPiece, selectedSquare }) => {
-    // Captures, captures!
+    // If some piece occupies the target square...
     if (game.find((piece) => getSquare(piece) === selectedSquare)) {
+      //...we get rid of it
       const newGame = [...game].filter(
         (piece) => getSquare(piece) !== selectedSquare
       );
+
+      // Then move
       movePiece({ game: newGame, selectedPiece, selectedSquare });
     } else {
       movePiece({ game, selectedPiece, selectedSquare });
@@ -110,6 +117,7 @@ const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
 
   return moveOrCapture;
 };
+
 const useLegalMoves = ({ game, selectedPiece }) => {
   const [legalMoves, setLegalMoves] = React.useState([]);
 
@@ -179,7 +187,7 @@ const useLegalMoves = ({ game, selectedPiece }) => {
     return findActualMoves(piece);
   };
 
-  // Setting legal moves on init
+  // Setting legal moves whenever the position or selected piece changes
   React.useEffect(() => {
     if (!selectedPiece) return;
     const legalMoves = getLegalMoves({ game, piece: selectedPiece });
