@@ -110,17 +110,61 @@ const StyledButton = styled.button`
 
 const Container = styled(FlexBox)`
   padding: 4em;
+  position: relative;
   @media (max-width: ${breakpoint}) {
     padding: 2em;
   }
 `;
 
+const PawnContainer = styled(FlexBox)`
+  position: absolute;
+  ${(props) => props.position === 'top' && 'top: 0;'}
+  ${(props) => props.position === 'bottom' && 'bottom: 0;'}
+  width: 100%;
+`;
+
 export const Button = (props) => {
   return (
-    <Container>
+    <Container column alignItems='center' justifyContent='center'>
+      {props.blackPawnsInLimbo && props.blackPawnsInLimbo > 0 ? (
+        <PawnContainer
+          position='top'
+          alignItems='center'
+          justifyContent='center'
+        >
+          {[...Array(props.blackPawnsInLimbo)].map((pawn) => (
+            <span
+              style={{ filter: 'brightness(3)' }}
+              role='img'
+              aria-label='pawn'
+            >
+              ♟️
+            </span>
+          ))}
+        </PawnContainer>
+      ) : null}
+
       <StyledButton {...props}>
         <Content tabIndex='-1'>{props.text}</Content>
       </StyledButton>
+
+      {props.whitePawnsInLimbo && props.whitePawnsInLimbo > 0 ? (
+        <PawnContainer
+          position='bottom'
+          alignItems='center'
+          justifyContent='center'
+        >
+          {[...Array(props.whitePawnsInLimbo)].map((pawn) => (
+            <span
+              style={{ filter: 'brightness(3)' }}
+              role='img'
+              aria-label='pawn'
+            >
+              ♟️
+            </span>
+          ))}
+        </PawnContainer>
+      ) : null}
     </Container>
   );
 };

@@ -11,6 +11,13 @@ const Controls = () => {
     (piece) => piece.type === 'pawn' && piece.colour === 'white'
   );
 
+  const whitePawnsInLimbo = Files.length - whitePawns.length;
+  const blackPawnsInLimbo = game.find(
+    (piece) => piece.colour === 'black' && piece.type === 'pawn'
+  )
+    ? 0
+    : 1;
+
   const genRandomID = (min, max) => {
     const existingIDs = game.map((piece) => piece.id);
     function generateRandomExcluding(min, max) {
@@ -46,7 +53,14 @@ const Controls = () => {
     setGame([...game, newPawn]);
   };
 
-  return <Button onClick={addPawn} text='♟️'></Button>;
+  return (
+    <Button
+      whitePawnsInLimbo={whitePawnsInLimbo}
+      blackPawnsInLimbo={blackPawnsInLimbo}
+      onClick={addPawn}
+      text='♟️'
+    ></Button>
+  );
 };
 
 export default Controls;
