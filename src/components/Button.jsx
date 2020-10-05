@@ -106,6 +106,8 @@ const StyledButton = styled.button`
         }
       `}
   }
+
+  ${(props) => props.disabled && `pointer-events: none`}
 `;
 
 const Container = styled(FlexBox)`
@@ -132,19 +134,15 @@ export const Button = (props) => {
           alignItems='center'
           justifyContent='center'
         >
-          {[...Array(props.blackPawnsInLimbo)].map((pawn) => (
-            <span
-              style={{ filter: 'brightness(3)' }}
-              role='img'
-              aria-label='pawn'
-            >
+          {[...Array(props.blackPawnsInLimbo)].map((pawn, i) => (
+            <span role='img' aria-label='pawn' key={i}>
               ♟️
             </span>
           ))}
         </PawnContainer>
       ) : null}
 
-      <StyledButton {...props}>
+      <StyledButton {...props} disabled={!props.whitePawnsInLimbo}>
         <Content tabIndex='-1'>{props.text}</Content>
       </StyledButton>
 
@@ -154,11 +152,12 @@ export const Button = (props) => {
           alignItems='center'
           justifyContent='center'
         >
-          {[...Array(props.whitePawnsInLimbo)].map((pawn) => (
+          {[...Array(props.whitePawnsInLimbo)].map((pawn, i) => (
             <span
               style={{ filter: 'brightness(3)' }}
               role='img'
               aria-label='pawn'
+              key={i}
             >
               ♟️
             </span>
