@@ -2,15 +2,14 @@ import React from 'react';
 import { pieces, getFileDiff, getSquare } from 'helpers/constants';
 import { useDrag } from 'react-dnd';
 import { useGame } from 'Game';
-import { PieceContainer, PieceUI, MoveOverlay } from 'styles/StyledComps';
+import { PieceContainer, PieceUI } from 'styles/StyledComps';
 import WhitePawn from 'assets/wp.png';
 import BlackPawn from 'assets/bp.png';
-import { pieceColour, usePrevious } from 'helpers/utils';
+import { pieceColour } from 'helpers/utils';
 import { useTransition, animated } from 'react-spring';
 
 const Pieces = () => {
   const { game, moving, selectedPiece, legalMoves } = useGame();
-  console.log('FROM GAME', game);
   const getPhysicalMovement = ({
     initRank,
     initFile,
@@ -22,7 +21,7 @@ const Pieces = () => {
     return `translate3d(${x}%, ${y}%, 0)`;
   };
 
-  const transitions = useTransition(
+  const pieces = useTransition(
     game,
     (item) => getSquare(item.file, item.rank),
     {
@@ -51,16 +50,12 @@ const Pieces = () => {
     }
   );
 
-  console.log('ON PIECES', transitions);
-
   return (
     <>
-      {transitions
-        // .filter((item) => item.props.transform)
-        .map(
-          ({ item, props, key }) =>
-            item && <Piece key={key} style={props} id={item.id} {...item} />
-        )}
+      {pieces.map(
+        ({ item, props, key }) =>
+          item && <Piece key={key} style={props} id={item.id} {...item} />
+      )}
     </>
   );
 };
@@ -69,11 +64,12 @@ const StaticPiece = ({ file, rank, colour, id, type, style }) => {
   const {
     selectedPiece,
     setPiece,
-    setSelectedSquare,
+    toggleSelectedSquare,
     dragging,
     setDragging,
     setMoving,
   } = useGame();
+
   // Dragging & dropping
   const [{ isDragging }, drag] = useDrag({
     item: { type: pieces.PAWN },
@@ -81,20 +77,20 @@ const StaticPiece = ({ file, rank, colour, id, type, style }) => {
       isDragging: !!monitor.isDragging(),
     }),
     begin: () => {
-      console.log('DRAGGING');
       setDragging(true);
       setPiece(id);
     },
     isDragging: () => {},
     end: () => {
       setDragging(false);
+      // forceSelectPiece(null);
     },
   });
 
   // Clicking
   const select = () => {
     if (selectedPiece) {
-      setSelectedSquare(file + rank);
+      toggleSelectedSquare(file + rank);
     } else {
       setPiece(id);
     }
@@ -111,7 +107,6 @@ const StaticPiece = ({ file, rank, colour, id, type, style }) => {
   const isSelected = selectedPiece && selectedPiece.id === id;
 
   const move = () => {
-    console.log(' -> ');
     setMoving(false);
   };
 
@@ -130,7 +125,7 @@ const StaticPiece = ({ file, rank, colour, id, type, style }) => {
       <PieceUI
         ref={drag}
         piece={handleType}
-        isDragging={isDragging}
+        isDragging={dragging}
         style={{ opacity: isDragging ? '.5' : 1 }}
       />
     </PieceContainer>

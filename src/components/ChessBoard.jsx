@@ -36,7 +36,7 @@ const Squares = ({ ranks, files, width }) => {
 const Square = ({ square, rank, file, width }) => {
   const {
     selectedSquare,
-    setSelectedSquare,
+    toggleSelectedSquare,
     legalMoves,
     selectedPiece,
     moving,
@@ -51,31 +51,36 @@ const Square = ({ square, rank, file, width }) => {
     accept: pieces.PAWN,
     drop: () => {
       setMoving({ rank, file });
-      setSelectedSquare(square);
+      toggleSelectedSquare(square);
     }, // Move pawn
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   });
 
+  const selectSquare = () => {
+    toggleSelectedSquare(square);
+    if (selectedPiece) {
+      setMoving({ rank, file });
+    }
+  };
+
   return (
     <Cell height={1} width={1} area={square}>
       <SquareItem
         ref={drop}
-        onClick={() => {
-          setSelectedSquare(square);
-        }}
+        data-square={square}
+        onClick={selectSquare}
         backgroundPosition={backgroundPosition}
         colour={colour}
         selected={selectedSquare === square}
-        data-square={square}
         selectedPiece={
           !moving &&
           selectedPiece &&
           selectedPiece.file + selectedPiece.rank === square
         }
       >
-        {/* {selectedSquare === square && square} */}
+        {!selectedPiece && selectedSquare === square && square}
         {isOver && <MoveOverlay legal={legalMoves.includes(square)} />}
       </SquareItem>
     </Cell>
@@ -83,8 +88,6 @@ const Square = ({ square, rank, file, width }) => {
 };
 
 const ChessBoard = ({ children }) => {
-  const { ref, width } = useDebouncedResizeObserver(500);
-
   // We need ranks in the direction of the browse
   const reversedRanks = React.useMemo(() => Ranks.slice().reverse(), []);
 
@@ -95,6 +98,9 @@ const ChessBoard = ({ children }) => {
     );
     return board;
   }, [reversedRanks]);
+
+  // We use this to calculate the UI of the board
+  const { ref, width } = useDebouncedResizeObserver(500);
 
   return (
     <BoardContainer>

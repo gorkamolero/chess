@@ -6,12 +6,7 @@ import { getSquare, getRank, getFile } from 'helpers/utils';
 export const GameContext = React.createContext(null);
 export const useGame = () => React.useContext(GameContext);
 
-/*
-
-Game is our most important component. It encapsulates the rules
-
-*/
-
+// Our most important component. It encapsulates the rules
 export const Game = ({ children }) => {
   // Here we declare the initial positions on the board
   const [game, setGame] = React.useState([
@@ -23,6 +18,10 @@ export const Game = ({ children }) => {
       id: 0,
     },
   ]);
+
+  // Dragging and moving initial states
+  const [dragging, setDragging] = React.useState(false);
+  const [moving, setMoving] = React.useState(false);
 
   // Selecting pieces
   const [selectedPiece, setSelectedPiece] = React.useState(null);
@@ -37,17 +36,16 @@ export const Game = ({ children }) => {
   const toggleSelectedSquare = (sq) =>
     setSelectedSquare(selectedSquare === sq ? null : sq);
 
+  // Get the piece legal moves
   const legalMoves = useLegalMoves({ game, selectedPiece });
 
+  // Move piece function
   const movePiece = usePieceMoves({
     game,
     setGame,
     selectedPiece,
     selectedSquare,
   });
-
-  const [dragging, setDragging] = React.useState(false);
-  const [moving, setMoving] = React.useState(false);
 
   // Moving a piece
   React.useEffect(() => {
@@ -61,7 +59,7 @@ export const Game = ({ children }) => {
     } else {
       setSelectedPiece(null);
     }
-  }, [selectedSquare, selectedPiece, game, legalMoves, movePiece]);
+  }, [selectedSquare, selectedPiece, game, legalMoves, movePiece, moving]);
 
   return (
     <GameContext.Provider
@@ -69,9 +67,8 @@ export const Game = ({ children }) => {
         game,
         setGame,
         selectedSquare,
-        setSelectedSquare: toggleSelectedSquare,
+        toggleSelectedSquare,
         selectedPiece,
-        forceMovePiece: setSelectedPiece,
         movePiece,
         setPiece: setSelectedPieceByID,
         legalMoves,
@@ -86,15 +83,9 @@ export const Game = ({ children }) => {
   );
 };
 
-const usePieceMoves = ({
-  game,
-  setGame,
-  selectedPiece,
-  selectedSquare,
-  moving,
-}) => {
+const usePieceMoves = ({ setGame, moving }) => {
   // Moving pieces
-  const movePiece = ({ game, selectedPiece, selectedSquare, moving }) => {
+  const movePiece = ({ game, selectedPiece, selectedSquare }) => {
     // Moving requires a selected piece and a selected square
     const movedPiece = {
       ...selectedPiece,
@@ -102,8 +93,6 @@ const usePieceMoves = ({
       rank: getRank(selectedSquare),
       file: getFile(selectedSquare),
     };
-
-    console.log(game, selectedPiece, movedPiece);
 
     // Construct the new position
     const newGame = [...game].map((piece) =>

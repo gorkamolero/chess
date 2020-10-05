@@ -128,7 +128,7 @@ export const PieceContainer = styled(Cell)`
   ${({ isDragging, selected }) =>
     isDragging && !selected && `pointer-events: none;`};
   ${({ selected }) => `
-    zIndex: ${selected ? 2 : 1};
+    z-index: ${selected ? 2 : 1};
   `};
 `;
 
@@ -143,7 +143,7 @@ export const PieceUI = styled.div`
     background-image: url(${piece});
     background-color: ${selected ? 'var(--gold)' : 'transparent'};
     opacity: ${isDragging ? '.5' : 1};
-    zIndex: ${selected ? 2 : 1};
+    z-index: ${selected ? 2 : 1};
   `};
   z-index: 1;
 `;
