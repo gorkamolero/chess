@@ -18,7 +18,7 @@ export const Stage = styled.main`
 
   @media (max-width: ${breakpoint}) {
     flex-direction: column;
-    padding: 3vh 3vw;
+    padding: 6vh 12vw;
     justify-content: flex-start;
   }
 `;
