@@ -5,6 +5,9 @@ export const prevFile = (file) => Files[Files.indexOf(file) - 1];
 export const isAdjacentFile = (ourFile, otherFile) =>
   [nextFile(ourFile), prevFile(ourFile)].includes(otherFile);
 export const findAdjacentFiles = (file) => [prevFile(file), nextFile(file)];
+export const getFileDiff = (initFile, targetFile) =>
+  Files.indexOf(targetFile) - Files.indexOf(initFile);
+export const getSquare = (file, rank) => file + rank;
 export const pieceRules = {
   pawn: {
     initialRank: {

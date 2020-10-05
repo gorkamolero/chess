@@ -38,8 +38,9 @@ const Square = ({ square, rank, file, width }) => {
     selectedSquare,
     setSelectedSquare,
     legalMoves,
-    movePiece,
     selectedPiece,
+    moving,
+    setMoving,
   } = useGame();
 
   // Setting BG Colour for squares
@@ -49,8 +50,8 @@ const Square = ({ square, rank, file, width }) => {
   const [{ isOver }, drop] = useDrop({
     accept: pieces.PAWN,
     drop: () => {
+      setMoving({ rank, file });
       setSelectedSquare(square);
-      movePiece({ ...selectedPiece, rank, file });
     }, // Move pawn
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -68,8 +69,13 @@ const Square = ({ square, rank, file, width }) => {
         colour={colour}
         selected={selectedSquare === square}
         data-square={square}
+        selectedPiece={
+          !moving &&
+          selectedPiece &&
+          selectedPiece.file + selectedPiece.rank === square
+        }
       >
-        {selectedSquare === square && square}
+        {/* {selectedSquare === square && square} */}
         {isOver && <MoveOverlay legal={legalMoves.includes(square)} />}
       </SquareItem>
     </Cell>

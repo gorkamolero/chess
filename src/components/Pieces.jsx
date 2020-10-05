@@ -1,39 +1,79 @@
 import React from 'react';
-import { pieces } from 'helpers/constants';
+import { pieces, getFileDiff, getSquare } from 'helpers/constants';
 import { useDrag } from 'react-dnd';
 import { useGame } from 'Game';
 import { PieceContainer, PieceUI, MoveOverlay } from 'styles/StyledComps';
 import WhitePawn from 'assets/wp.png';
 import BlackPawn from 'assets/bp.png';
-import { pieceColour } from 'helpers/utils';
+import { pieceColour, usePrevious } from 'helpers/utils';
+import { useTransition, animated } from 'react-spring';
 
 const Pieces = () => {
-  const { game } = useGame();
+  const { game, moving, selectedPiece, legalMoves } = useGame();
+  console.log('FROM GAME', game);
+  const getPhysicalMovement = ({
+    initRank,
+    initFile,
+    targetRank,
+    targetFile,
+  }) => {
+    const y = (initRank - targetRank) * 100;
+    const x = getFileDiff(initFile, targetFile) * 100;
+    return `translate3d(${x}%, ${y}%, 0)`;
+  };
+
+  const transitions = useTransition(
+    game,
+    (item) => getSquare(item.file, item.rank),
+    {
+      from: { opacity: 0 },
+      enter: { opacity: 1 },
+      leave: { opacity: 0 },
+      update: ({ id }) => {
+        if (
+          moving &&
+          selectedPiece &&
+          legalMoves &&
+          selectedPiece.id === id &&
+          legalMoves.includes(moving.file + moving.rank)
+        ) {
+          return {
+            transform: getPhysicalMovement({
+              initRank: selectedPiece.rank,
+              initFile: selectedPiece.file,
+              targetRank: moving.rank,
+              targetFile: moving.file,
+            }),
+          };
+        } else return null;
+        //
+      },
+    }
+  );
+
+  console.log('ON PIECES', transitions);
 
   return (
     <>
-      {game.map(({ id, ...rest }) => (
-        <Piece key={rest.file + rest.rank} id={id} {...rest} />
-      ))}
+      {transitions
+        // .filter((item) => item.props.transform)
+        .map(
+          ({ item, props, key }) =>
+            item && <Piece key={key} style={props} id={item.id} {...item} />
+        )}
     </>
   );
 };
 
-export const Piece = ({ file, rank, colour, id, type }) => {
+const StaticPiece = ({ file, rank, colour, id, type, style }) => {
   const {
     selectedPiece,
     setPiece,
     setSelectedSquare,
     dragging,
     setDragging,
+    setMoving,
   } = useGame();
-  const [square, movePiece] = React.useState(file + rank);
-
-  // Moving the piece if its rank or file changes
-  React.useEffect(() => {
-    movePiece(file + rank);
-  }, [file, rank]);
-
   // Dragging & dropping
   const [{ isDragging }, drag] = useDrag({
     item: { type: pieces.PAWN },
@@ -41,13 +81,13 @@ export const Piece = ({ file, rank, colour, id, type }) => {
       isDragging: !!monitor.isDragging(),
     }),
     begin: () => {
+      console.log('DRAGGING');
       setDragging(true);
       setPiece(id);
     },
     isDragging: () => {},
     end: () => {
       setDragging(false);
-      setPiece(null);
     },
   });
 
@@ -70,15 +110,22 @@ export const Piece = ({ file, rank, colour, id, type }) => {
   // Helper
   const isSelected = selectedPiece && selectedPiece.id === id;
 
+  const move = () => {
+    console.log(' -> ');
+    setMoving(false);
+  };
+
   return (
     <PieceContainer
       width={1}
       height={1}
-      area={square}
+      area={file + rank}
       className={`piece ${colour} pawn`}
       onClick={select}
       isDragging={dragging}
       selected={isSelected}
+      style={style}
+      onTransitionEnd={move}
     >
       <PieceUI
         ref={drag}
@@ -86,9 +133,10 @@ export const Piece = ({ file, rank, colour, id, type }) => {
         isDragging={isDragging}
         style={{ opacity: isDragging ? '.5' : 1 }}
       />
-      {isSelected && <MoveOverlay legal />}
     </PieceContainer>
   );
 };
+
+const Piece = animated(StaticPiece);
 
 export default Pieces;

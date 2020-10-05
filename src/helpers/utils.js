@@ -1,3 +1,4 @@
+import React from 'react';
 import { Files, Ranks } from 'helpers/constants';
 
 export const getSquare = ({ file, rank }) => file + rank;
@@ -38,6 +39,14 @@ export const shuffleArray = (a) => {
   }
   return a;
 };
+
+export function usePrevious(value) {
+  const ref = React.useRef();
+  React.useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
 /* 
 export function flip(elements, changeFunc, vars) {

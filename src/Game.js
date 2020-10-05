@@ -46,20 +46,22 @@ export const Game = ({ children }) => {
     selectedSquare,
   });
 
+  const [dragging, setDragging] = React.useState(false);
+  const [moving, setMoving] = React.useState(false);
+
   // Moving a piece
   React.useEffect(() => {
-    if (!selectedPiece || !selectedSquare) return;
+    if (!selectedPiece || !selectedSquare || !!moving) return;
 
     if (legalMoves.includes(selectedSquare)) {
-      movePiece({ game, selectedPiece, selectedSquare });
+      movePiece({ game, selectedPiece, selectedSquare, moving });
       setSelectedPiece(null);
       setSelectedSquare(null);
+      // setMoving(false);
     } else {
       setSelectedPiece(null);
     }
   }, [selectedSquare, selectedPiece, game, legalMoves, movePiece]);
-
-  const [dragging, setDragging] = React.useState(false);
 
   return (
     <GameContext.Provider
@@ -69,11 +71,14 @@ export const Game = ({ children }) => {
         selectedSquare,
         setSelectedSquare: toggleSelectedSquare,
         selectedPiece,
-        movePiece: setSelectedPiece,
+        forceMovePiece: setSelectedPiece,
+        movePiece,
         setPiece: setSelectedPieceByID,
         legalMoves,
         dragging,
         setDragging,
+        moving,
+        setMoving,
       }}
     >
       {children}
@@ -81,9 +86,15 @@ export const Game = ({ children }) => {
   );
 };
 
-const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
+const usePieceMoves = ({
+  game,
+  setGame,
+  selectedPiece,
+  selectedSquare,
+  moving,
+}) => {
   // Moving pieces
-  const movePiece = ({ game, selectedPiece, selectedSquare }) => {
+  const movePiece = ({ game, selectedPiece, selectedSquare, moving }) => {
     // Moving requires a selected piece and a selected square
     const movedPiece = {
       ...selectedPiece,
@@ -92,10 +103,13 @@ const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
       file: getFile(selectedSquare),
     };
 
+    console.log(game, selectedPiece, movedPiece);
+
     // Construct the new position
     const newGame = [...game].map((piece) =>
       piece.id === selectedPiece.id ? movedPiece : piece
     );
+
     setGame(newGame);
   };
 
@@ -109,9 +123,14 @@ const usePieceMoves = ({ game, setGame, selectedPiece, selectedSquare }) => {
       );
 
       // Then move
-      movePiece({ game: newGame, selectedPiece, selectedSquare });
+      movePiece({
+        game: newGame,
+        selectedPiece,
+        selectedSquare,
+        moving,
+      });
     } else {
-      movePiece({ game, selectedPiece, selectedSquare });
+      movePiece({ game, selectedPiece, selectedSquare, moving });
     }
   };
 

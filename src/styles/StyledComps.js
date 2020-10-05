@@ -79,15 +79,16 @@ export const SquareItem = styled.div`
     }`};
 
   ${(props) =>
-    props.selected &&
-    `&:after {
+    props.selected ||
+    (props.selectedPiece &&
+      `&:after {
       content: '';
       background: var(--gold);
       position: absolute;
       top: 0; right: 0; bottom: 0; left: 0;
       width: 100%; height: 100%;
       opacity: .65;
-    }`};
+    }`)};
 `;
 
 export const IndicatorParent = styled(Cell)`
@@ -111,6 +112,7 @@ export const PieceContainer = styled(Cell)`
   align-items: stretch;
   justify-content: stretch;
   position: relative;
+  transition: transform 0.15s cubic-bezier(0.45, 0, 0.55, 1);
   ${(selected) =>
     selected &&
     `&:after {
@@ -125,6 +127,9 @@ export const PieceContainer = styled(Cell)`
     }`}
   ${({ isDragging, selected }) =>
     isDragging && !selected && `pointer-events: none;`};
+  ${({ selected }) => `
+    zIndex: ${selected ? 2 : 1};
+  `};
 `;
 
 export const PieceUI = styled.div`
@@ -138,6 +143,7 @@ export const PieceUI = styled.div`
     background-image: url(${piece});
     background-color: ${selected ? 'var(--gold)' : 'transparent'};
     opacity: ${isDragging ? '.5' : 1};
+    zIndex: ${selected ? 2 : 1};
   `};
   z-index: 1;
 `;
